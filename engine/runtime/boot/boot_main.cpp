@@ -481,6 +481,7 @@ struct Live {
                 interp_vertices += st.match.vertices_b;
                 interp_matched += st.match.matched_vertices;
                 interp_jumped += st.jumped_strips;
+                interp_welded += st.welded_vertices;
                 if (!blended) {
                     ++interp_cuts;
                 } else if (interp_off.render(renderer, interp_frame, geometry)) {
@@ -1087,7 +1088,7 @@ struct Live {
     std::vector<dream::render::StripPair> interp_pairs;
     dream::render::BlendOptions interp_opts;
     std::uint64_t interp_rendered = 0, interp_presented = 0, interp_cuts = 0, interp_jumped = 0,
-                  interp_vertices = 0, interp_matched = 0;
+                  interp_welded = 0, interp_vertices = 0, interp_matched = 0;
     double interp_ms = 0.0;
     std::uint64_t vram_invalidated = 0;  // textures dropped because the guest rewrote them
     std::chrono::steady_clock::time_point last_present{};
@@ -3049,8 +3050,8 @@ int main(int argc, char** argv) {
         if (live->interpolate)
             std::printf(
                 "interpolation: %llu blended frames drawn, %llu presented, %llu camera cuts; "
-                "%.1f%% of vertices paired, %llu strips not blended (implausible jump); "
-                "%.2f ms per blend\n",
+                "%.1f%% of vertices paired, %llu strips not blended (implausible jump), "
+                "%llu edge vertices welded; %.2f ms per blend\n",
                 static_cast<unsigned long long>(live->interp_rendered),
                 static_cast<unsigned long long>(live->interp_presented),
                 static_cast<unsigned long long>(live->interp_cuts),
@@ -3058,6 +3059,7 @@ int main(int argc, char** argv) {
                                             static_cast<double>(live->interp_vertices)
                                       : 0.0,
                 static_cast<unsigned long long>(live->interp_jumped),
+                static_cast<unsigned long long>(live->interp_welded),
                 live->interp_rendered ? live->interp_ms / static_cast<double>(live->rendered) : 0.0);
         live->pacing.report();
         live->sync.report();

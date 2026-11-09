@@ -3,10 +3,10 @@
 // Dreamcast games transform vertices on the CPU, so a display list holds screen-space geometry and
 // no matrices. To draw a frame between two game frames, each strip of the newer frame is paired
 // with the same strip of the older one and their vertex positions are blended. Strips carry no
-// identity; pairing relies on games emitting their scene in a stable order, which
-// docs/INTERPOLATION.md (dreamcomp) measures per game. A strip pairs with one of the same signature
-// -- the parameter words (PCW/ISP/TSP/TCW) and vertex count -- in submission order, skipping at most
-// `window` unmatched strips on either side (objects appearing, disappearing or clipped differently).
+// identity: a strip pairs with an unused strip of the older frame with the same signature -- the
+// parameter words (PCW/ISP/TSP/TCW), vertex count and texture coordinates -- the one nearest on
+// screen, wherever it sits in the list (games re-sort translucent strips by depth). `window` is
+// unused since 2026-11-09 (kept for callers).
 #pragma once
 
 #include <cstdint>
@@ -40,6 +40,7 @@ struct BlendOptions {
 struct BlendStats {
     MatchStats match;
     std::uint32_t blended_strips = 0, jumped_strips = 0;
+    std::uint32_t welded_vertices = 0;  // unblended vertices moved with a blended one at the same spot
     float median_motion = 0.0f;
     bool cut = false;
 };

@@ -12,11 +12,14 @@ keeps running at its own 60 Hz (series rule: never change the logic rate).
 
 1. Each game render produces a decoded `Frame` (strips with screen-space vertices).
 2. Strips of frame N+1 are paired with strips of frame N (`dream::render::match_frames`,
-   `engine/render/include/dream/render/interpolate.h`): same parameter words and vertex count, in submission
-   order, with a small lookahead for strips that appear or disappear.
+   `engine/render/include/dream/render/interpolate.h`): same parameter words, vertex count and texture coordinates, by key,
+   not by submission order (games re-sort translucent strips by depth); among identical copies
+   (both hands, repeated letters) the unused one nearest on screen (2026-11-09,
+   Rayman 2: CPU-culled meshes shifted pairings by one strip and tore).
 3. An in-between frame is drawn with every paired strip's vertices blended at t = 0.5 (position
    and 1/w; texture coordinates and colours from the newer frame), unpaired strips as in the newer
-   frame. HUD primitives do not move, so they blend to themselves.
+   frame, except that their vertices sitting exactly on a blended vertex take its blended position
+   (no open seams between blended and unblended strips of one mesh). HUD primitives do not move, so they blend to themselves.
 4. Presentation: in-between frame, then the real frame half a game-frame later. One game frame of
    added latency (~16.7 ms). Only useful on displays above 60 Hz; off otherwise.
 5. Camera cuts (median displacement far above normal) skip the in-between frame.
