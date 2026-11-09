@@ -90,6 +90,7 @@ then re-check every row below (a row whose change upstream absorbed is moved to 
 | Upstream commit | Date pulled | Notes |
 |---|---|---|
 | `51a148c7bf9191fa8593e707c4996cf887076b33` | 2026-10-05 | Evaluated on Windows 11 / clang-cl 22 / Iris Xe: Soulcalibur (USA) reaches Character Select |
+| 2026-11-09 | `engine/runtime/src/pvr/core.cpp`, `engine/runtime/include/dream/runtime/pvr/core.h` | Display lists kept per buffer: `TA_LIST_INIT` files the finished stream under its `TA_ISP_BASE & 0xF00000` and starts a new one; `STARTRENDER` draws the stream for `PARAM_BASE & 0xF00000` (the one being filled if they match); `SOFTRESET` bit 0 and `TA_LIST_CONT` only restart the parser (`Ta::list_continue`) instead of clearing the stream (Flycast tactx / `ta_vtx_SoftReset` / `ta_vtx_ListCont`) | Rayman 2 double-buffers: each frame it inits buffer B, sends ~2,600 words, starts the render of A, sends ~9,900 more, then soft-resets. The render drew B's first part (opaque cliffs) and the soft reset threw away sky, water, title text and menus | not offered yet |
 
 ## Upstreamed
 

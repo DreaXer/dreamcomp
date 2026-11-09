@@ -56,6 +56,12 @@ void Ta::reset() noexcept {
     stream.clear();
 }
 
+void Ta::list_continue() noexcept {
+    state_ = kNs;
+    current_list = 7;
+    pending_v64_ = false;
+}
+
 void Ta::feed(const std::uint32_t words[8]) {
     ++chunks;
     stream.insert(stream.end(), words, words + 8);
@@ -189,15 +195,26 @@ void Core::reset() {
     regs_[0x110 >> 2] = 0x00090639u;  // FB_BURSTCTRL
     regs_[0x11C >> 2] = 0x000000FFu;  // PT_ALPHA_REF
     ta.reset();
+    contexts_.clear();
+    ta_key_ = kNoContext;
     fifo_fill_ = 0;
     seen_ta_data_ = false;
 }
 
 void Core::start_render() {
     ++renders;
+    // Draw the display list in the buffer PARAM_BASE names (Flycast keys contexts the same way).
+    // A game that double-buffers starts this render while the TA is still filling the other one.
+    const std::vector<std::uint32_t>* stream = &ta.stream;
+    const std::uint32_t key = regs_[kParamBase >> 2] & kContextMask;
+    if (key != ta_key_) {
+        const auto it = contexts_.find(key);
+        if (it != contexts_.end())
+            stream = &it->second;
+    }
     if (on_render)
-        on_render(ta.stream);
-    const std::uint64_t cycles = render_base_cycles + render_cycles_per_word * ta.stream.size();
+        on_render(*stream);
+    const std::uint64_t cycles = render_base_cycles + render_cycles_per_word * stream->size();
     sched_.request(render_event_, cycles);
 }
 
@@ -356,18 +373,25 @@ void Core::write(std::uint32_t addr, std::uint32_t value, unsigned size) {
         case kTaListInit:
             if (value >> 31) {
                 ++list_inits;
+                // The finished list stays in its buffer for a later render of that buffer.
+                if (ta_key_ != kNoContext && !ta.stream.empty())
+                    contexts_[ta_key_] = std::move(ta.stream);
                 ta.reset();
+                ta_key_ = regs_[kTaIspBase >> 2] & kContextMask;
+                contexts_.erase(ta_key_);
                 regs_[kTaNextOpb >> 2] = regs_[kTaNextOpbInit >> 2];
                 regs_[kTaItpCurrent >> 2] = regs_[kTaIspBase >> 2];
             }
             return;
         case kTaListCont:
-            ta.reset();
+            ta.list_continue();
             return;
         case kSoftReset:
             regs_[off >> 2] = value;
+            // A TA soft reset restarts the parameter parser; the lists already written stay in
+            // video memory (Flycast ta_vtx_SoftReset). Rayman 2 resets after each frame's lists.
             if (value & 1u)
-                ta.reset();
+                ta.list_continue();
             return;
         case kFbRCtrl: {
             const bool changed = ((regs_[off >> 2] ^ value) >> 23) & 1u;

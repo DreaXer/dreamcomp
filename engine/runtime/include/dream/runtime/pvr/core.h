@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <unordered_map>
 #include <vector>
 
 #include "dream/runtime/holly/intc.h"
@@ -40,6 +41,9 @@ struct ListStats {
 class Ta {
 public:
     void reset() noexcept;
+    // TA_LIST_CONT: back to "no list open" so the guest can open more lists, keeping what it
+    // already sent (Flycast ta_vtx_ListCont).
+    void list_continue() noexcept;
     void feed(const std::uint32_t words[8]);
     std::function<void(unsigned list)> on_list_end;
 
@@ -101,6 +105,12 @@ public:
     std::uint64_t render_base_cycles = 200'000, render_cycles_per_word = 4;
 
 private:
+    // Finished display lists by buffer (TA_ISP_BASE at list init, PARAM_BASE at render, both
+    // masked to the 1 MB region as Flycast does); ta.stream is the one being filled, ta_key_'s.
+    static constexpr std::uint32_t kContextMask = 0x00F00000u, kNoContext = ~0u;
+    std::unordered_map<std::uint32_t, std::vector<std::uint32_t>> contexts_;
+    std::uint32_t ta_key_ = kNoContext;
+
     void start_render();
     void fifo_word(std::uint32_t addr, std::uint32_t value);
     // YUV converter (WP2.3): the guest streams 4:2:0 macroblocks into the converter FIFO and the
