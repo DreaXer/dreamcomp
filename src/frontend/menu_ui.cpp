@@ -940,6 +940,10 @@ std::string MenuUi::tab_graphics() {
                        "Expanded aspect ratio.",
                        true, {wide, wide});
     }
+    for (unsigned i = 0; cfg_.port && i < cfg_.port->graphics_toggle_count; ++i) {
+        const auto& t = cfg_.port->graphics_toggles[i];
+        s += row_onoff(t.key, t.name, draft_.get_bool(t.key, t.def), t.help, true);
+    }
     return s;
 }
 

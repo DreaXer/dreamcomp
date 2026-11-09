@@ -535,6 +535,8 @@ public:
     // player's overrides. While the F1 editor watches, every frame also leaves a snapshot of the
     // HUD for it -- with a 4:3 picture too, where nothing is moved.
     void on_frame(dream::render::Frame& frame) override {
+        if (g_port && g_port->on_frame)
+            g_port->on_frame(frame, g_settings);
         // Before the HUD correction, which moves pieces off whole console pixels.
         if (sharp_2d_)
             sharpened_ += sharpen_2d(frame);

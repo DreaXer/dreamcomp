@@ -151,6 +151,7 @@ over 20 ms 48 -> 4 after moving RmlUi off the game thread (the rest: first open,
 | Version | the port project's `VERSION` |
 | Art, colours | `dreamcomp_add_port(... LAUNCHER_DIR <dir>)`: `art.png` is drawn over the backdrop; `port.rcss` is linked after `dreamcomp.rcss` |
 | Icon | `dreamcomp_add_port(... ICON <png> ICON_ICO <ico>)`, see below |
+| Game-specific on/off rows (Graphics tab) | `PortInfo::graphics_toggles` / `graphics_toggle_count`: key, label, description, default; saved as `key = true/false`, applied at once; the port reads `settings.get_bool(key, def)` in its callbacks (Rayman 2: `cinema_bars`, read in `PortInfo::on_frame` to drop the cutscene bands) |
 
 Port art must be the port author's own work, never extracted from the disc (LEGAL.md).
 

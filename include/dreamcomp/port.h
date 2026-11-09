@@ -17,7 +17,10 @@
 
 namespace dream {
 class System;
+namespace render {
+struct Frame;
 }
+}  // namespace dream
 
 namespace dreamcomp {
 
@@ -62,6 +65,20 @@ struct PortInfo {
 
     // Anything else the port wants each vblank (cheats, debug overlays...).
     void (*on_vblank)(dream::System& sys, Settings& settings) = nullptr;
+    // Each frame's display list, before the HUD correction: drop or change polygons (e.g. a
+    // game's letterbox bars). Remove a polygon by erasing it from its list.
+    void (*on_frame)(dream::render::Frame& frame, Settings& settings) = nullptr;
+
+    // On/off rows the port adds to the Graphics tab, saved as `key` = true/false and applied at
+    // once (read them in the callbacks with settings.get_bool(key, def)).
+    struct Toggle {
+        const char* key;
+        const char* name;  // row label
+        const char* help;  // description (RML: <b>, <br/>)
+        bool def;
+    };
+    const Toggle* graphics_toggles = nullptr;
+    unsigned graphics_toggle_count = 0;
     // Once, before the first guest instruction.
     void (*on_start)(dream::System& sys, Settings& settings) = nullptr;
 };
