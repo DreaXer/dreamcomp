@@ -668,6 +668,13 @@ std::string MenuUi::tab_general() {
                    "<b>Exact 59.94 Hz</b> keeps the console's timing; a 60 Hz screen then shows "
                    "one frame twice about every 17 seconds.",
                    false);
+    if (cfg_.port && cfg_.port->languages)
+        s += row_radio("language", "Language", language_choices(cfg_.port->languages),
+                       resolve_language(cfg_.port->languages, draft_.get("language")),
+                       "The console's language, which the game's menus and texts follow. Until "
+                       "you pick one, your system's language when the game has it, else "
+                       "English.",
+                       false);
     s += row_button("r-about", "readme", "About", "Read me", kAboutText);
     return s;
 }
@@ -1167,6 +1174,10 @@ void MenuUi::adjust(const std::string& key, int step) {
     } else if (key == "frame_timing") {
         draft_.set("frame_timing", cycle({{"display", ""}, {"exact", ""}},
                                          draft_.get("frame_timing", "display"), step));
+    } else if (key == "language" && cfg_.port && cfg_.port->languages) {
+        draft_.set("language", cycle(language_choices(cfg_.port->languages),
+                                     resolve_language(cfg_.port->languages, draft_.get("language")),
+                                     step));
     } else if (key == "latency") {
         draft_.set("latency", cycle({{"standard", ""}, {"low", ""}}, draft_.get("latency", "standard"), step));
     } else if (key == "hud_layout") {

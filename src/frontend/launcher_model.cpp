@@ -93,6 +93,20 @@ std::vector<Choice> fps_choices() {
     return {{"auto", "Auto"}, {"120", "120"}, {"60", "60  (original)"}};
 }
 
+std::vector<Choice> language_choices(const char* languages) {
+    // The UI font has Latin with accents but no Japanese script. Option rows are upper-cased by
+    // the stylesheet, which RmlUi does for ASCII only: accented names are written upper case.
+    static const Choice kNames[] = {
+        {"english", "English"},  {"french", "FRAN\xC3\x87" "AIS"}, {"german", "Deutsch"},
+        {"spanish", "ESPA\xC3\x91OL"}, {"italian", "Italiano"},  {"japanese", "Japanese"}};
+    std::vector<Choice> out;
+    const std::string list = std::string(",") + (languages ? languages : "") + ",";
+    for (const auto& c : kNames)
+        if (list.find("," + c.value + ",") != std::string::npos)
+            out.push_back(c);
+    return out;
+}
+
 std::vector<Choice> fit_choices() {
     return {{"crop", "Crop  (no bars)"}, {"letterbox", "Letterbox"}, {"stretch", "Stretch"}};
 }

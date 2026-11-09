@@ -283,7 +283,7 @@ public:
             if (eq != std::string::npos &&
                 (key == "texture_pack" || key == "dump_textures" || key == "aspect" ||
                  key == "fullscreen" || key == "scale" || key == "rumble" || key == "mods" || key == "volume" || key == "clip" ||
-                 key == "fps" || key == "frame_timing" || key == "latency"))
+                 key == "fps" || key == "frame_timing" || key == "latency" || key == "language"))
                 g_settings.set(key, kv.substr(eq + 1));
         }
         // The aspect flags decide the render target's shape, which the engine needs before it
@@ -308,6 +308,12 @@ public:
             !has_flag(args, "--render-aspect")) {
             args.push_back("--render-aspect");
             args.push_back(std::to_string(aspect));
+        }
+        // Console language (PortInfo::languages): the player's, else the system's.
+        if (const std::string lang = resolve_language(g_port->languages, g_settings.get("language"));
+            !lang.empty() && !has_flag(args, "--language")) {
+            args.push_back("--language");
+            args.push_back(lang);
         }
         if (g_settings.get_bool("fullscreen", false) && !has_flag(args, "--fullscreen"))
             args.push_back("--fullscreen");

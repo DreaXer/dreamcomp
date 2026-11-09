@@ -28,6 +28,10 @@ class Settings;
 
 struct PortInfo {
     const char* id = nullptr;     // settings folder name, e.g. "soulcalibur"
+    // Console languages the disc has, comma-separated engine names ("english,french,german,
+    // spanish,italian,japanese"): a Language row in the General tab, setting `language`, passed
+    // as --language (default: the system's language when listed). Null: no row, English.
+    const char* languages = nullptr;
     const char* title = nullptr;  // shown in the window title and menus
     unsigned players = 4;         // player cards in the Controls tab (1..4, Maple ports A-D)
 

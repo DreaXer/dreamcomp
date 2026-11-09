@@ -19,6 +19,9 @@ enum class Broadcast : std::uint8_t { Ntsc = 0, Pal, PalM, PalN };
 // full ("Japan", "USA", "Europe"; ipbin.py), so those are the names to expect; anything else,
 // including an absent field, falls back to USA rather than guessing.
 Region region_from_name(std::string_view name) noexcept;
+// "japanese", "english", "german", "french", "spanish", "italian" (--language); anything else is
+// English, the console's default outside Japan.
+Language language_from_name(std::string_view name) noexcept;
 // Europe shipped PAL, everywhere else NTSC. Only a default: a title that cares reads the flash.
 constexpr Broadcast broadcast_for(Region r) noexcept {
     return r == Region::Europe ? Broadcast::Pal : Broadcast::Ntsc;

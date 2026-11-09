@@ -53,6 +53,8 @@ float parse_aspect(const std::string& s);  // "16:9" -> 1.778; anything else -> 
 std::vector<Choice> aspect_choices(bool widescreen, float max_aspect);
 std::vector<Choice> fit_choices();
 std::vector<Choice> fps_choices();  // setting `fps`: auto / 120 / 60 (docs/INTERPOLATION.md)
+// Setting `language`: the disc's languages (PortInfo::languages), each named in itself.
+std::vector<Choice> language_choices(const char* languages);
 // Index of `value` in `choices` (0 if absent), and the value `step` places further, wrapping.
 std::size_t choice_index(const std::vector<Choice>& choices, const std::string& value);
 std::string cycle(const std::vector<Choice>& choices, const std::string& value, int step);

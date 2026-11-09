@@ -67,6 +67,20 @@ Region region_from_name(std::string_view name) noexcept {
     return Region::Usa;
 }
 
+Language language_from_name(std::string_view name) noexcept {
+    if (name == "japanese")
+        return Language::Japanese;
+    if (name == "german")
+        return Language::German;
+    if (name == "french")
+        return Language::French;
+    if (name == "spanish")
+        return Language::Spanish;
+    if (name == "italian")
+        return Language::Italian;
+    return Language::English;
+}
+
 void Flash::format(Language lang, Region region, Broadcast broadcast, const char* sysinfo) {
     std::memset(data_, 0xFF, kSize);
     // Factory partition: the system string twice, as the BIOS validates it. Both copies carry the

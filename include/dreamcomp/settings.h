@@ -37,4 +37,9 @@ private:
 // The platform config directory for `port_id` (created on demand by save()).
 std::filesystem::path default_config_dir(const std::string& port_id);
 
+// The console language to start with, for a port whose disc has `languages` (PortInfo::languages,
+// comma-separated engine names such as "english,french"): the setting `language` when the disc
+// has it, else the system's language when the disc has it, else English, else the first listed.
+std::string resolve_language(const char* languages, const std::string& setting);
+
 }  // namespace dreamcomp

@@ -39,7 +39,7 @@ reproduce with the default, `latency=low`, `fps=120` or `frame_timing=exact`.
 
 | Tab | Rows | Applies in game |
 |---|---|---|
-| General | Rumble strength (slider, 0 = off), Frame rate (Auto/120/60), Frame timing (Match display / Exact 59.94 Hz; docs/PACING.md), About (credits; opens the read-me) | rumble live; frame rate next start |
+| General | Rumble strength (slider, 0 = off), Frame rate (Auto/120/60), Frame timing (Match display / Exact 59.94 Hz; docs/PACING.md), Language (the disc's languages, `PortInfo::languages`, each named in itself; unset = the system's language when the disc has it, else English; passed as the engine's `--language`), About (credits; opens the read-me) | rumble live; frame rate, language next start |
 | Controls | RecompFrontend's layout, below | bindings: at once |
 | Graphics | Resolution 1–8×, Aspect ratio (Original / Expanded, as in the N64 recomps; Expanded only with `PortInfo::widescreen`), Window mode, Latency (Standard / Low; Windows only; docs/PACING.md), HUD layout (Original = 4:3 centred / Expanded = anchored to the edges; never stretched; with `PortInfo::hud`) | aspect, window mode, HUD live; resolution next start |
 
@@ -102,7 +102,7 @@ containers) in regions: launcher list; panel tab bar, rows, footer; dialog butto
 ## Settings keys
 
 `disc`, `scale`, `aspect` (`original`/`expanded`), `fullscreen`, `fps`, `frame_timing` (`display`/`exact`), `latency` (`standard`/`low`), `rumble`, `volume`, `clip`, `hud_fix`,
-`hud_layout`, `texture_pack`, `dump_textures`, `mods` (ARCHITECTURE.md § Settings).
+`hud_layout`, `texture_pack`, `dump_textures`, `mods`, `language` (`english`/`french`/`german`/`spanish`/`italian`/`japanese`) (ARCHITECTURE.md § Settings).
 
 ## How it is built
 

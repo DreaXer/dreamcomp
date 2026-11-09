@@ -1576,6 +1576,8 @@ void usage(const char* argv0, std::FILE* out) {
         "  --texture-pack DIR     replace textures with DIR/**/*_<hash>.png (with --window;\n"
         "                         dreamcomp docs/TEXTURE-PACKS.md)\n"
         "  --dump-textures DIR    write each distinct texture once as DIR/<w>x<h>_<fmt>_<hash>.png\n"
+        "  --language NAME        the synthesised console's language: english (default), french,\n"
+        "                         german, spanish, italian, japanese\n"
         "  --flash FILE           a 128 KB console flash image; without it one is synthesised\n"
         "                         Created, blank and formatted, if the path does not exist. A "
         "file\n"
@@ -1726,6 +1728,7 @@ int main(int argc, char** argv) {
                                       // some titles and not others: a title that reads the user's
                                       // settings out of the flash user partition may refuse to
                                       // start on a synthetic one.
+    std::string language = "english";  // --language NAME (dreamcomp): the console's language
     const char* disc_override = nullptr;  // --disc FILE (dreamcomp): the image, overriding [disc]
     float render_aspect = 0.0f;           // --render-aspect A (dreamcomp): render target shape
     // --mod DIR (dreamcomp, repeatable): file-replacement mod roots layered over the disc
@@ -1852,6 +1855,8 @@ int main(int argc, char** argv) {
         else if (!std::strcmp(argv[i], "--bindings") && i + 1 < argc) {
             bindings_file = argv[++i];
             bindings_file_set = true;
+        } else if (!std::strcmp(argv[i], "--language") && i + 1 < argc) {
+            language = argv[++i];
         } else if (!std::strcmp(argv[i], "--flash") && i + 1 < argc) {
             flash_image = argv[++i];
         } else if (!std::strcmp(argv[i], "--dump-flash") && i + 1 < argc) {
@@ -2056,7 +2061,10 @@ int main(int argc, char** argv) {
     // reads the factory partition should not be told it is running on a Japanese machine because
     // that happened to be the hardcoded default.
     const auto region = dream::hle::region_from_name(cfg.region);
-    bios.set_locale(dream::hle::Language::English, region, dream::hle::broadcast_for(region));
+    // The language is the player's (--language); it only reaches a synthesised flash, as a loaded
+    // image keeps its own.
+    bios.set_locale(dream::hle::language_from_name(language), region,
+                    dream::hle::broadcast_for(region));
     sys.install();
     bios.setup_boot(cfg.entry);
     const std::vector<std::uint8_t> ipbin(sys.memory.ram() + 0x8000, sys.memory.ram() + 0x10000);

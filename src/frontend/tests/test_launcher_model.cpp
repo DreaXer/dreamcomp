@@ -69,6 +69,12 @@ int main(int argc, char** argv) {
     CHECK(aspect_choices(false, 4.0f).size() == 1);
     CHECK(aspect_choices(true, 32.0f / 9.0f).size() == 4);
     CHECK(aspect_choices(true, 16.0f / 9.0f).size() == 2);
+    CHECK(language_choices("english,french").size() == 2);
+    CHECK(language_choices(nullptr).empty());
+    CHECK(dreamcomp::resolve_language("english,french", "french") == "french");
+    CHECK(dreamcomp::resolve_language(nullptr, "french").empty());
+    CHECK(dreamcomp::resolve_language("german,italian", "japanese") != "japanese");  // not on disc
+    CHECK(cycle(language_choices("english,french,german"), "german", 1) == "english");
     CHECK(cycle(fit_choices(), "crop", 1) == "letterbox");
     CHECK(cycle(fit_choices(), "crop", -1) == "stretch");
     CHECK(cycle(fit_choices(), "bogus", 1) == "letterbox");

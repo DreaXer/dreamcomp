@@ -5,6 +5,12 @@
 #include <mutex>
 #include <sstream>
 
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 namespace dreamcomp {
 
 namespace {
@@ -18,6 +24,51 @@ std::string trim(const std::string& s) {
 }
 
 }  // namespace
+
+namespace {
+
+// The user's interface language as an engine name ("french"), or empty when not one of those.
+std::string system_language() {
+#if defined(_WIN32)
+    switch (GetUserDefaultUILanguage() & 0x3FF) {  // PRIMARYLANGID
+    case 0x09: return "english";
+    case 0x0C: return "french";
+    case 0x07: return "german";
+    case 0x0A: return "spanish";
+    case 0x10: return "italian";
+    case 0x11: return "japanese";
+    default: return {};
+    }
+#else
+    std::string v;
+    for (const char* k : {"LC_ALL", "LC_MESSAGES", "LANG"})
+        if (const char* e = std::getenv(k); e && *e) {
+            v = e;
+            break;
+        }
+    const std::string p = v.substr(0, 2);
+    return p == "en" ? "english" : p == "fr" ? "french" : p == "de" ? "german"
+         : p == "es" ? "spanish" : p == "it" ? "italian" : p == "ja" ? "japanese" : "";
+#endif
+}
+
+}  // namespace
+
+std::string resolve_language(const char* languages, const std::string& setting) {
+    if (!languages || !*languages)
+        return {};
+    const std::string list = std::string(",") + languages + ",";
+    const auto has = [&](const std::string& l) {
+        return !l.empty() && list.find("," + l + ",") != std::string::npos;
+    };
+    if (has(setting))
+        return setting;
+    if (const std::string sys = system_language(); has(sys))
+        return sys;
+    if (has("english"))
+        return "english";
+    return list.substr(1, list.find(',', 1) - 1);
+}
 
 std::filesystem::path default_config_dir(const std::string& port_id) {
     std::filesystem::path base;
